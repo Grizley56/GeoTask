@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29424.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTask.WebApi", "GeoTask.WebApi\GeoTask.WebApi.csproj", "{112C05AC-3162-4934-824A-594816C8B937}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTask.GeoUpdate", "GeoTask.GeoUpdate\GeoTask.GeoUpdate.csproj", "{97259183-8732-49D6-A7BE-A88FC4B3C568}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{FF9CB5F1-E73D-417D-99D6-D67BA0854DA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTask.Common", "GeoTask.Common\GeoTask.Common.csproj", "{AABAE2B5-6814-41DC-9891-127F7694CB52}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{01A11ECB-6A43-4963-AC2D-0F00A26B2DF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTask.Application", "GeoTask.Application\GeoTask.Application.csproj", "{F1EE316D-FB33-46FD-93FE-91EB64C45E7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{112C05AC-3162-4934-824A-594816C8B937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{112C05AC-3162-4934-824A-594816C8B937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{112C05AC-3162-4934-824A-594816C8B937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{112C05AC-3162-4934-824A-594816C8B937}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97259183-8732-49D6-A7BE-A88FC4B3C568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97259183-8732-49D6-A7BE-A88FC4B3C568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97259183-8732-49D6-A7BE-A88FC4B3C568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97259183-8732-49D6-A7BE-A88FC4B3C568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AABAE2B5-6814-41DC-9891-127F7694CB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AABAE2B5-6814-41DC-9891-127F7694CB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AABAE2B5-6814-41DC-9891-127F7694CB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AABAE2B5-6814-41DC-9891-127F7694CB52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1EE316D-FB33-46FD-93FE-91EB64C45E7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1EE316D-FB33-46FD-93FE-91EB64C45E7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1EE316D-FB33-46FD-93FE-91EB64C45E7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1EE316D-FB33-46FD-93FE-91EB64C45E7F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{112C05AC-3162-4934-824A-594816C8B937} = {FF9CB5F1-E73D-417D-99D6-D67BA0854DA1}
+		{97259183-8732-49D6-A7BE-A88FC4B3C568} = {01A11ECB-6A43-4963-AC2D-0F00A26B2DF7}
+		{F1EE316D-FB33-46FD-93FE-91EB64C45E7F} = {FF9CB5F1-E73D-417D-99D6-D67BA0854DA1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DDA41A75-3B22-4179-8890-65446E78FCF7}
+	EndGlobalSection
+EndGlobal
