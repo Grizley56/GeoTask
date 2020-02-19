@@ -14,7 +14,7 @@ namespace GeoTask.GeoUpdate
 		{
 			SimpleConsoleLogger logger = new SimpleConsoleLogger();
 
-			bool forceRun = CommandLine.ContainsArgument(args, "force");
+			bool forceRun = CommandLine.ContainsArgument(args, "-force");
 
 			if (!CommandLine.TryGetArgumentValue(args, "-licenseKey", out var licenseKey))
 			{
@@ -32,7 +32,7 @@ namespace GeoTask.GeoUpdate
 			GeoUpdater updater = new GeoUpdater(
 				new Geo2LiteHttpService(licenseKey),
 				new GeoDbWriter(new NpgDatabaseFactory(connectionString.Trim('"'))),
-				new Geo2LiteExtractor(), 
+				new Geo2LiteZipExtractor(), 
 				logger.Log);
 
 			await updater.Start(forceRun);

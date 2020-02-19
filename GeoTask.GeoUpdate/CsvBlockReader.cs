@@ -25,20 +25,20 @@ namespace GeoTask.GeoUpdate
 		public int? AccuracyRadius;
 	}
 
-	public class CsvBlockReader : IEnumerable<GeoBlock>
+	public class CsvBlockReader : IEnumerable<GeoBlock>, IDisposable
 	{
-		private readonly string[] _files;
+		private readonly Stream[] _streams;
 
-		public CsvBlockReader(params string[] files)
+		public CsvBlockReader(params Stream[] streams)
 		{
-			_files = files;
+			_streams = streams;
 		}
 
 		public IEnumerator<GeoBlock> GetEnumerator()
 		{
-			foreach (var file in _files)
+			foreach (var stream in _streams)
 			{
-				using var reader = new StreamReader(file);
+				using var reader = new StreamReader(stream);
 				using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
 				csv.Read();
@@ -81,6 +81,14 @@ namespace GeoTask.GeoUpdate
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public void Dispose()
+		{
+			foreach (var stream in _streams)
+			{
+				stream.Dispose();
+			}
 		}
 	}
 }

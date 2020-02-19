@@ -28,6 +28,8 @@ namespace GeoTask.GeoUpdate
 
 	internal class GeoDbWriter: IGeoDbWriter
 	{
+		public const int MaxThreadsCount = 6;
+
 		private readonly INpgDbFactory _npgDbFactory;
 
 		public GeoDbWriter(INpgDbFactory npgDbFactory)
@@ -60,12 +62,12 @@ namespace GeoTask.GeoUpdate
 				}
 			}
 
-			var ip = InsertIpBlocks(blocks, logger);
+			var ip = Task.Run(() => InsertIpBlocks(blocks, logger));
 
 			try
 			{
 				await TaskHelper.RunWithLimitCount(
-					locations.Select(i => InsertLocations(i.locations, i.localeIso639, logger)), 8);
+					locations.Select(i => InsertLocations(i.locations, i.localeIso639, logger)), MaxThreadsCount);
 
 				await ip;
 			}
@@ -108,17 +110,16 @@ namespace GeoTask.GeoUpdate
 
 			try
 			{
-				await importConnection.OpenAsync();
+				await importConnection.OpenAsync().ConfigureAwait(false);
 
 				using var import = importConnection.BeginBinaryImport(
 					"COPY __ip (network, geoname_id, latitude, longitude, accuracy_radius) FROM STDIN (FORMAT BINARY)");
 
 				foreach (var ipBlock in blocks)
 				{
-					await import.StartRowAsync();
+					await import.StartRowAsync().ConfigureAwait(false);
 
-					await import.WriteAsync(new ValueTuple<IPAddress, int>(ipBlock.IpAddress, ipBlock.IpMask),
-							NpgsqlDbType.Inet)
+					await import.WriteAsync(new ValueTuple<IPAddress, int>(ipBlock.IpAddress, ipBlock.IpMask), NpgsqlDbType.Inet)
 						.ConfigureAwait(false);
 					await import.WriteAsync(ipBlock.GeoNameId, NpgsqlDbType.Bigint)
 						.ConfigureAwait(false);

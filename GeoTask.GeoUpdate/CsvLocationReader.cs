@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -20,22 +21,22 @@ namespace GeoTask.GeoUpdate
 
 	}
 
-	public class CsvLocationReader : IEnumerable<GeoLocation>
+	public class CsvLocationReader : IEnumerable<GeoLocation>, IDisposable
 	{
 		public string LanguageISO639 { get; }
 
-		private readonly string _file;
+		private readonly Stream _stream;
 
-		public CsvLocationReader(string file, string languageISO639)
+		public CsvLocationReader(Stream stream, string languageISO639)
 		{
-			_file = file;
+			_stream = stream;
 			LanguageISO639 = languageISO639;
 		}
 
 
 		public IEnumerator<GeoLocation> GetEnumerator()
 		{
-			using var reader = new StreamReader(_file);
+			using var reader = new StreamReader(_stream);
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
 			csv.Read();
@@ -90,6 +91,11 @@ namespace GeoTask.GeoUpdate
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public void Dispose()
+		{
+			_stream?.Dispose();
 		}
 	}
 }

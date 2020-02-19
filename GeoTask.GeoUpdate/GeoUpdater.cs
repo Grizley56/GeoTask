@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,7 +37,17 @@ namespace GeoTask.GeoUpdate
 		{
 			_logger?.Invoke("Update started");
 
-			string lastMd5 = await _httpService.FetchMd5();
+			string lastMd5;
+
+			try
+			{
+				lastMd5 = await _httpService.FetchMd5();
+			}
+			catch (Exception ex)
+			{
+				_logger?.Invoke("MD5 fetch failed with exception. Details: " + ex.Message);
+				return;
+			}
 
 			if (File.Exists(_md5Path))
 			{
@@ -62,31 +71,32 @@ namespace GeoTask.GeoUpdate
 
 			var tempPath = Path.Combine(Path.GetTempPath(), "geo2lite.tar.gz");
 
+			Stream stream;
+
 			try
 			{
 				_logger?.Invoke("Downloading started");
 
-				await _httpService.DownloadCsv(tempPath);
+				stream = await _httpService.DownloadCsv();
+				
 			}
 			catch (Exception ex)
 			{
 				_logger?.Invoke("Downloading failed with exception. Details: " + ex.Message);
 				return;
 			}
-			
-			using (_extractor)
+
+			_logger?.Invoke("Extracting files");
+
+			using (var storage = _extractor.Extract(stream))
 			{
-				_logger?.Invoke("Extracting files");
-
-				_extractor.Extract(tempPath);
-
 				_logger?.Invoke("Extracting completed");
 
 				try
 				{
 					await _dbWriter.Write(
-						_extractor.BlocksReader,
-						_extractor.LocationsReader.Select(i => ((IEnumerable<GeoLocation>) i, i.LanguageISO639)),
+						storage.BlocksReader,
+						storage.LocationReaders.Select(i => ((IEnumerable<GeoLocation>)i, i.LanguageISO639)),
 						_logger);
 				}
 				catch

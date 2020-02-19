@@ -2,7 +2,7 @@
   "profiles": {
     "GeoTask.GeoUpdate": {
       "commandName": "Project",
-      "commandLineArgs": "-db \"Server=127.0.0.1;Database=GeoDb;User Id=postgres;Password=postgres;\" -licenseKey QWERTY"
+      "commandLineArgs": "-db \"Server=127.0.0.1;Database=GeoDb;User Id=postgres;Password=Creativ;\" -licenseKey 3GrHxAyLnrMS3U9k -force"
     }
   }
 }

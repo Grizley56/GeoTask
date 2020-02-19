@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace GeoTask.GeoUpdate
 {
 	internal interface IGeo2LiteHttpService
 	{
-		Task DownloadCsv(string path);
+		Task<Stream> DownloadCsv();
 		Task<string> FetchMd5();
 	}
 }

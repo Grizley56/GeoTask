@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using System.Web;
 
 namespace GeoTask.GeoUpdate
 {
-	internal class Geo2LiteHttpService: IGeo2LiteHttpService
+	internal class Geo2LiteHttpService : IGeo2LiteHttpService
 	{
 		private readonly string _licenseKey;
 
@@ -21,19 +22,28 @@ namespace GeoTask.GeoUpdate
 			Host = host;
 		}
 
-		public async Task DownloadCsv(string path)
+		public async Task<Stream> DownloadCsv()
 		{
 			using var httpClient = new HttpClient();
-			using var file = File.Create(path);
+
 			using var response = await httpClient.GetAsync(BuildAddress("zip"));
 
 			if (response.IsSuccessStatusCode)
-				await response.Content.CopyToAsync(file);
+			{
+				MemoryStream seekableStream = new MemoryStream();
+				using (var httpStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+				{
+					await httpStream.CopyToAsync(seekableStream).ConfigureAwait(false);
+					seekableStream.Position = 0;
+					return seekableStream;
+				}
+			}
 
 			if (response.StatusCode == HttpStatusCode.Unauthorized)
 				throw new InvalidLicenseKeyException();
 
 			response.EnsureSuccessStatusCode();
+			return Stream.Null;
 		}
 
 		private string BuildAddress(string suffix)
@@ -47,7 +57,7 @@ namespace GeoTask.GeoUpdate
 			using var httpClient = new HttpClient();
 
 			var response = await httpClient.GetAsync(BuildAddress("zip.md5"));
-			
+
 			if (response.IsSuccessStatusCode)
 				return await response.Content.ReadAsStringAsync();
 
