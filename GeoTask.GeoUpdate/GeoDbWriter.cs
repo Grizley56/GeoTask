@@ -22,14 +22,12 @@ namespace GeoTask.GeoUpdate
 	{
 		Task Write(
 			IEnumerable<GeoBlock> blocks,
-			IEnumerable<(IEnumerable<GeoLocation> locations, string localeIso639)> locations, 
+			IEnumerable<GeoLocation> locations, 
 			Action<string> logger);
 	}
 
 	internal class GeoDbWriter: IGeoDbWriter
 	{
-		public const int MaxThreadsCount = 6;
-
 		private readonly INpgDbFactory _npgDbFactory;
 
 		public GeoDbWriter(INpgDbFactory npgDbFactory)
@@ -39,14 +37,14 @@ namespace GeoTask.GeoUpdate
 
 		public async Task Write(
 			IEnumerable<GeoBlock> blocks, 
-			IEnumerable<(IEnumerable<GeoLocation> locations, string localeIso639)> locations,
+			IEnumerable<GeoLocation> locations,
 			Action<string> logger)
 		{
 			logger?.Invoke("Import started.");
 
 			Stopwatch sw = Stopwatch.StartNew();
-			
-			string[] tableNames = locations.Select(i => $"geo_data_{i.localeIso639}").Concat(new[] {"ip"}).ToArray();
+
+			string[] tableNames = new[] {"ip", "location"};
 
 			using (var connection = _npgDbFactory.CreateConnection())
 			{
@@ -62,14 +60,12 @@ namespace GeoTask.GeoUpdate
 				}
 			}
 
-			var ip = Task.Run(() => InsertIpBlocks(blocks, logger));
+			var ipTask = Task.Run(() => InsertIpBlocks(blocks, logger));
+			var locationsTask = InsertLocations(locations, logger);
 
 			try
 			{
-				await TaskHelper.RunWithLimitCount(
-					locations.Select(i => InsertLocations(i.locations, i.localeIso639, logger)), MaxThreadsCount);
-
-				await ip;
+				await Task.WhenAll(ipTask, locationsTask);
 			}
 			catch
 			{
@@ -143,7 +139,7 @@ namespace GeoTask.GeoUpdate
 			logger?.Invoke("Ip-addresses imported successfully. Total time: " + sw.Elapsed);
 		}
 
-		private async Task InsertLocations(IEnumerable<GeoLocation> locations, string localeIso639, Action<string> logger)
+		private async Task InsertLocations(IEnumerable<GeoLocation> locations, Action<string> logger)
 		{
 			Stopwatch sw = Stopwatch.StartNew();
 
@@ -155,9 +151,9 @@ namespace GeoTask.GeoUpdate
 					.ConfigureAwait(false);
 
 				using NpgsqlBinaryImporter import =
-					connection.BeginBinaryImport($"COPY \"__geo_data_{localeIso639}\" " +
+					connection.BeginBinaryImport($"COPY __location " +
 					                             $"(geoname_id, time_zone, metro_code, country_name, country_iso_code, " +
-					                             $"continent_name, continent_code, city_name, is_in_european_union) FROM STDIN (FORMAT BINARY)");
+					                             $"continent_name, continent_code, city_name, is_in_european_union, locale_code) FROM STDIN (FORMAT BINARY)");
 
 				foreach (var location in locations)
 				{
@@ -182,6 +178,8 @@ namespace GeoTask.GeoUpdate
 						.ConfigureAwait(false);
 					await import.WriteAsync(location.IsInEuropeanUnion, NpgsqlDbType.Boolean)
 						.ConfigureAwait(false);
+					await import.WriteAsync(location.LocaleCode, NpgsqlDbType.Varchar)
+						.ConfigureAwait(false);
 				}
 
 				await import.CompleteAsync()
@@ -189,12 +187,12 @@ namespace GeoTask.GeoUpdate
 			}
 			catch (Exception ex)
 			{
-				logger?.Invoke($"Locations [{localeIso639}] importing failed. Detailed: {ex.Message}");
+				logger?.Invoke($"Locations importing failed. Detailed: {ex.Message}");
 
 				throw;
 			}
 
-			logger?.Invoke($"Locations [{localeIso639}] imported successfully. Total time: {sw.Elapsed}");
+			logger?.Invoke($"Locations imported successfully. Total time: {sw.Elapsed}");
 		}
 
 		private NpgsqlCommand CreateTempTableCommand(string tableName, string asTable)

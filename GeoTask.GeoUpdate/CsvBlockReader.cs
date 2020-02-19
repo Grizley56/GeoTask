@@ -27,21 +27,28 @@ namespace GeoTask.GeoUpdate
 
 	public class CsvBlockReader : IEnumerable<GeoBlock>, IDisposable
 	{
-		private readonly Stream[] _streams;
+		private readonly IEnumerable<Stream> _streams;
 
-		public CsvBlockReader(params Stream[] streams)
+		public CsvBlockReader(IEnumerable<Stream> streams)
 		{
 			_streams = streams;
+		}
+
+		public CsvBlockReader(Stream stream)
+			:this(new []{stream})
+		{
+			
 		}
 
 		public IEnumerator<GeoBlock> GetEnumerator()
 		{
 			foreach (var stream in _streams)
 			{
-				if (stream.Length == 0)
+				using var reader = new StreamReader(stream);
+
+				if (reader.EndOfStream)
 					continue;
 
-				using var reader = new StreamReader(stream);
 				using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
 				csv.Read();

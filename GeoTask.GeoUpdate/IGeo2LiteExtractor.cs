@@ -17,7 +17,7 @@ namespace GeoTask.GeoUpdate
 		public ICsvStorage Extract(Stream stream)
 		{
 			List<Stream> ipAddressBlocks = new List<Stream>(2);
-			List<CsvLocationReader> locationReaders = new List<CsvLocationReader>(8);
+			List<Stream> locations = new List<Stream>(8);
 
 			ZipFile zip = new ZipFile(stream);
 
@@ -45,14 +45,12 @@ namespace GeoTask.GeoUpdate
 
 					if (split[2].Equals("Locations"))
 					{
-						locationReaders.Add(new CsvLocationReader(inputStream,
-							string.Join("-", split, 3, split.Length - 3)));
+						locations.Add(inputStream);
 					}
-
 				}
 			}
 
-			return new CsvMemoryStorage( new CsvBlockReader(ipAddressBlocks.ToArray()), locationReaders.ToArray());
+			return new CsvMemoryStorage( new CsvBlockReader(ipAddressBlocks), new CsvLocationReader(locations));
 		}
 	}
 }

@@ -49,7 +49,7 @@ namespace GeoTask.GeoUpdate.Tests
 			Mock<IGeoDbWriter> dbWriterMock = new Mock<IGeoDbWriter>();
 			Mock<IGeo2LiteExtractor> geoExtractorMock = new Mock<IGeo2LiteExtractor>();
 			geoExtractorMock.Setup(i => i.Extract(It.IsAny<Stream>())).Returns(() => new CsvMemoryStorage(
-				new CsvBlockReader(Stream.Null), new CsvLocationReader[0]));
+				new CsvBlockReader(Stream.Null), new CsvLocationReader(Stream.Null)));
 
 
 			var md5Storage = new InMemoryMd5Storage();

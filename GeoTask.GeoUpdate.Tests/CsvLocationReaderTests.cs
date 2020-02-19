@@ -23,7 +23,7 @@ namespace GeoTask.GeoUpdate.Tests
 		[Test]
 		public void EnumerateReader_Test()
 		{
-			CsvLocationReader reader = new CsvLocationReader(_csv.ToStream(), "en");
+			CsvLocationReader reader = new CsvLocationReader(_csv.ToStream());
 
 			Assert.That(reader, Has.Exactly(3).Items);
 		}
@@ -31,7 +31,7 @@ namespace GeoTask.GeoUpdate.Tests
 		[Test]
 		public void EnumerateEmptyStream_DoesNotThrow_Test()
 		{
-			CsvLocationReader reader = new CsvLocationReader(Stream.Null, "en");
+			CsvLocationReader reader = new CsvLocationReader(Stream.Null);
 
 			Assert.DoesNotThrow(() =>
 			{
@@ -43,7 +43,7 @@ namespace GeoTask.GeoUpdate.Tests
 		[Test]
 		public void EnumerateEmptyStream_IsEmpty_Test()
 		{
-			CsvLocationReader reader = new CsvLocationReader(Stream.Null, "en");
+			CsvLocationReader reader = new CsvLocationReader(Stream.Null);
 
 			Assert.IsEmpty(reader);
 		}
@@ -56,6 +56,7 @@ namespace GeoTask.GeoUpdate.Tests
 				GeoNameId = 75337,
 				ContinentCode = "AS",
 				ContinentName = "Asia",
+				LocaleCode = "L",
 				CountryIsoCode = "YE",
 				CountryName = "Yemen",
 				CityName = "Hajjah",
@@ -65,11 +66,11 @@ namespace GeoTask.GeoUpdate.Tests
 			};
 
 			var csv =
-				"geoname_id,continent_code,continent_name,country_iso_code,country_name," +
+				"geoname_id,locale_code,continent_code,continent_name,country_iso_code,country_name," +
 				"city_name,metro_code,time_zone,is_in_european_union\n" +
-				"75337,AS,Asia,YE,Yemen,Hajjah,,Asia/Aden,0\n";
+				"75337,L,AS,Asia,YE,Yemen,Hajjah,,Asia/Aden,0\n";
 
-			CsvLocationReader reader = new CsvLocationReader(csv.ToStream(), "en");
+			CsvLocationReader reader = new CsvLocationReader(csv.ToStream());
 
 			var row = reader.First();
 
@@ -83,6 +84,7 @@ namespace GeoTask.GeoUpdate.Tests
 				Assert.AreEqual(geoLocation.MetroCode, row.MetroCode);
 				Assert.AreEqual(geoLocation.TimeZone, row.TimeZone);
 				Assert.AreEqual(geoLocation.IsInEuropeanUnion, row.IsInEuropeanUnion);
+				Assert.AreEqual(geoLocation.LocaleCode, row.LocaleCode);
 			});
 		}
 

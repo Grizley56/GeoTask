@@ -89,7 +89,7 @@ namespace GeoTask.GeoUpdate
 				{
 					await _dbWriter.Write(
 						storage.BlocksReader,
-						storage.LocationReaders.Select(i => ((IEnumerable<GeoLocation>)i, i.LanguageISO639)),
+						storage.LocationsReader,
 						_logger);
 				}
 				catch
