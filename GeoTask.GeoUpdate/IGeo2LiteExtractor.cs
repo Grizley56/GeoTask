@@ -7,7 +7,7 @@ using ICSharpCode.SharpZipLib.Zip;
 
 namespace GeoTask.GeoUpdate
 {
-	internal interface IGeo2LiteExtractor
+	public interface IGeo2LiteExtractor
 	{
 		ICsvStorage Extract(Stream stream);
 	}

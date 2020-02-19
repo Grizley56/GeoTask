@@ -18,7 +18,7 @@ using NpgsqlTypes;
 
 namespace GeoTask.GeoUpdate
 {
-	internal interface IGeoDbWriter
+	public interface IGeoDbWriter
 	{
 		Task Write(
 			IEnumerable<GeoBlock> blocks,

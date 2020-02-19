@@ -33,6 +33,8 @@ namespace GeoTask.GeoUpdate
 				new Geo2LiteHttpService(licenseKey),
 				new GeoDbWriter(new NpgDatabaseFactory(connectionString.Trim('"'))),
 				new Geo2LiteZipExtractor(), 
+				new LocalMd5Storage(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+					"GeoUpdateService", "lastDownload.md5")), 
 				logger.Log);
 
 			await updater.Start(forceRun);

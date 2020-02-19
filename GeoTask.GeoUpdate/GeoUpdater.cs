@@ -7,25 +7,21 @@ using System.Threading.Tasks;
 
 namespace GeoTask.GeoUpdate
 {
-	internal class GeoUpdater
+	public class GeoUpdater
 	{
 		private readonly IGeo2LiteHttpService _httpService;
 		private readonly IGeoDbWriter _dbWriter;
 		private readonly IGeo2LiteExtractor _extractor;
-
-		private readonly string _md5Path;
-
+		private readonly IMD5StorageService _md5Storage;
 		private readonly Action<string> _logger;
 
-		public GeoUpdater(IGeo2LiteHttpService httpService, IGeoDbWriter dbWriter, IGeo2LiteExtractor extractor, Action<string> logger)
+		public GeoUpdater(IGeo2LiteHttpService httpService, IGeoDbWriter dbWriter, IGeo2LiteExtractor extractor, IMD5StorageService md5Storage, Action<string> logger)
 		{
 			_httpService = httpService;
 			_dbWriter = dbWriter;
 			_extractor = extractor;
+			_md5Storage = md5Storage;
 			_logger = logger;
-
-			_md5Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-				"GeoUpdateService", "lastDownload.md5");
 		}
 
 		/// <summary>
@@ -49,10 +45,10 @@ namespace GeoTask.GeoUpdate
 				return;
 			}
 
-			if (File.Exists(_md5Path))
-			{
-				string currentMd5 = await File.ReadAllTextAsync(_md5Path);
+			string currentMd5 = await _md5Storage.FetchMd5();
 
+			if (currentMd5 != null)
+			{
 				_logger?.Invoke("Current MD5: " + currentMd5);
 
 				_logger?.Invoke("Last MD5: " + lastMd5);
@@ -69,8 +65,6 @@ namespace GeoTask.GeoUpdate
 				}
 			}
 
-			var tempPath = Path.Combine(Path.GetTempPath(), "geo2lite.tar.gz");
-
 			Stream stream;
 
 			try
@@ -78,7 +72,6 @@ namespace GeoTask.GeoUpdate
 				_logger?.Invoke("Downloading started");
 
 				stream = await _httpService.DownloadCsv();
-				
 			}
 			catch (Exception ex)
 			{
@@ -105,12 +98,7 @@ namespace GeoTask.GeoUpdate
 				}
 			}
 
-			var md5Dir = Path.GetDirectoryName(_md5Path);
-
-			if (!Directory.Exists(md5Dir))
-				Directory.CreateDirectory(md5Dir);
-
-			File.WriteAllText(_md5Path, lastMd5, Encoding.UTF8);
+			await _md5Storage.SaveMd5(currentMd5);
 		}
 	}
 }

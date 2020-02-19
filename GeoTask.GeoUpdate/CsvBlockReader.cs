@@ -38,6 +38,9 @@ namespace GeoTask.GeoUpdate
 		{
 			foreach (var stream in _streams)
 			{
+				if (stream.Length == 0)
+					continue;
+
 				using var reader = new StreamReader(stream);
 				using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 

@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace GeoTask.GeoUpdate
 {
-	internal interface ICsvStorage : IDisposable
+	public interface ICsvStorage : IDisposable
 	{
 		CsvBlockReader BlocksReader { get; }
 		CsvLocationReader[] LocationReaders { get; }
 	}
 
-	internal class CsvMemoryStorage : ICsvStorage
+	public class CsvMemoryStorage : ICsvStorage
 	{
 		public CsvBlockReader BlocksReader { get; private set; }
 		public CsvLocationReader[] LocationReaders { get; private set; }

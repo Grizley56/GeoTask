@@ -36,6 +36,9 @@ namespace GeoTask.GeoUpdate
 
 		public IEnumerator<GeoLocation> GetEnumerator()
 		{
+			if (_stream.Length == 0)
+				yield break;
+
 			using var reader = new StreamReader(_stream);
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
@@ -79,7 +82,7 @@ namespace GeoTask.GeoUpdate
 					CityName = cityName,
 					ContinentCode = continentCode,
 					ContinentName = continentName,
-					CountryIsoCode = continentCode,
+					CountryIsoCode = countryIso,
 					CountryName = countryName,
 					IsInEuropeanUnion = isInEuropeanUnion,
 					MetroCode = metroCode,

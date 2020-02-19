@@ -10,17 +10,29 @@ namespace GeoTask.GeoUpdate.Utils
 		public static bool TryParseCIDR(string value, out IPAddress address, out byte mask)
 		{
 			address = IPAddress.None;
-			mask = 0;
+			mask = 32;
 
 			var split = value.Split('/');
 
-			if (split.Length != 2 || !IPAddress.TryParse(split[0], out var ipAddress) ||! byte.TryParse(split[1], out var ipMask))
-				return false;
+			if (split.Length > 0 && split.Length <= 2)
+			{
+				if (!IPAddress.TryParse(split[0], out var ipAddress))
+					return false;
 
-			address = ipAddress;
-			mask = ipMask;
+				address = ipAddress;
 
-			return true;
+				if (split.Length == 2)
+				{
+					if (!byte.TryParse(split[1], out var ipMask) || ipMask > 32)
+						return false;
+
+					mask = ipMask;
+				}
+				
+				return true;
+			}
+
+			return false;
 		}
 	}
 }
